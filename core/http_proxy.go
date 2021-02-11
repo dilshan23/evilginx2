@@ -81,6 +81,8 @@ type ProxySession struct {
 	Index       int
 }
 
+
+// this method is used to modify HttpProxy structure's values or make a new obkect of it?..not being called form elsewhere
 func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *database.Database, bl *Blacklist, developer bool) (*HttpProxy, error) {
 	p := &HttpProxy{
 		Proxy:             goproxy.NewProxyHttpServer(),
