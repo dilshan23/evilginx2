@@ -55,7 +55,7 @@ const (
 )
 
 type HttpProxy struct {
-	Server            *http.Server
+	Server            *http.Server   //two servers ? https.sErver and goproxy.ProxyHttpServer
 	Proxy             *goproxy.ProxyHttpServer
 	crt_db            *CertDb
 	cfg               *Config
@@ -82,7 +82,8 @@ type ProxySession struct {
 }
 
 
-// this method is used to modify HttpProxy structure's values or make a new obkect of it?..not being called form elsewhere
+// this method is used to modify HttpProxy structure's values or make a new object of it?..not being called form elsewhere //the returned modified HttpProxy struct is u
+//used by somewhere else
 func NewHttpProxy(hostname string, port int, cfg *Config, crt_db *CertDb, db *database.Database, bl *Blacklist, developer bool) (*HttpProxy, error) {
 	p := &HttpProxy{
 		Proxy:             goproxy.NewProxyHttpServer(),
